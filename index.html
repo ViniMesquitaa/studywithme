@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rumo à Fuvest: mapa mental e roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+:root{
+  --bg:#F7F8FA; --surface:#FFFFFF; --soft:#F0F2F5;
+  --text:#1A1D23; --muted:#667085; --line:#E4E7EC;
+  --ink:#2B59C3; --hot:#E0A100; --here:#D1435B;
+  --mat:#3563D6; --fis:#13926F; --qui:#8452D9; --red:#D1436A; --lin:#B7791F; --ger:#5A7393; --est:#4B5563;
+  --focus:#2B59C3;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1217; --surface:#171B22; --soft:#1E232C;
+    --text:#E8EAED; --muted:#9AA3AF; --line:#29303B;
+    --ink:#8AA8FF; --hot:#F2C14E; --here:#FF7A90;
+    --mat:#86A6FF; --fis:#52D1A9; --qui:#B79AFF; --red:#FF86A6; --lin:#F0BA5A; --ger:#A3B6CF; --est:#C3CAD4;
+    --focus:#8AA8FF;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1217; --surface:#171B22; --soft:#1E232C;
+  --text:#E8EAED; --muted:#9AA3AF; --line:#29303B;
+  --ink:#8AA8FF; --hot:#F2C14E; --here:#FF7A90;
+  --mat:#86A6FF; --fis:#52D1A9; --qui:#B79AFF; --red:#FF86A6; --lin:#F0BA5A; --ger:#A3B6CF; --est:#C3CAD4;
+  --focus:#8AA8FF;
+  color-scheme: dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 90px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+h1,h2,h3,h4,h5{line-height:1.2;margin:0;font-weight:700;letter-spacing:-.01em}
+a{color:var(--ink);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
+img,svg{max-width:100%}
+mark{background:none;color:inherit;font-weight:650;padding:0}
+mark::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--hot);margin-left:7px;vertical-align:middle;transform:translateY(-1px)}
+
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+
+.hero{padding:44px 0 28px;display:grid;grid-template-columns:1.5fr 1fr;gap:32px;align-items:end}
+.hero h1{font-size:clamp(2.1rem,5vw,3.1rem);letter-spacing:-.025em}
+.hero p{margin:.7rem 0 0;color:var(--muted);max-width:54ch;font-size:1.02rem}
+.here-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;gap:16px;align-items:center}
+.here-card .pow{font-weight:700;font-size:2.6rem;line-height:1;color:var(--ink);flex:none;letter-spacing:-.02em}
+.here-card .pow sup{font-size:.5em;vertical-align:1.1em;margin-left:.02em}
+.here-card strong{display:block;font-weight:600;font-size:.98rem;line-height:1.4}
+.here-card span{color:var(--muted);font-size:.88rem;line-height:1.45;display:block;margin-top:3px}
+
+.bar-top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar-top .wrap{display:flex;gap:16px;align-items:center;justify-content:space-between;padding-top:10px;padding-bottom:10px}
+.tabs{display:inline-flex;gap:2px;background:var(--soft);padding:4px;border-radius:12px}
+.tabs a{text-decoration:none;color:var(--muted);padding:7px 14px;border-radius:9px;font-weight:600;font-size:.92rem;white-space:nowrap}
+.tabs a:hover{color:var(--text)}
+.tabs a[aria-current="page"]{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.overall{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--muted);white-space:nowrap}
+.overall .bar{width:120px}
+.bar{height:6px;border-radius:99px;background:var(--soft);overflow:hidden;display:block}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:99px;transition:width .3s}
+
+.view{display:none;padding:28px 0 64px}
+.view.active{display:block}
+
+/* Mapa mental */
+.map-tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:7px 13px;font-weight:600;font-size:.88rem}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn.primary:hover{opacity:.92;background:var(--ink)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.83rem;color:var(--muted);align-items:center}
+.legend .lg{display:inline-flex;gap:6px;align-items:center}
+.legend .dot{width:11px;height:11px;border-radius:50%;border:1.75px solid var(--mat);display:inline-block}
+.legend .dot.f{background:var(--mat)}
+.legend .dot.o{border-style:dashed;border-color:var(--muted)}
+.legend .hotdot{width:7px;height:7px;border-radius:50%;background:var(--hot);display:inline-block}
+.map-box{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface);height:clamp(440px,72svh,820px)}
+#map{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#map:active{cursor:grabbing}
+#map text{font-family:inherit}
+.hint{position:absolute;left:14px;bottom:12px;font-size:.78rem;color:var(--muted)}
+
+.link{fill:none;stroke:var(--c);stroke-opacity:.32;stroke-width:1.3}
+.node{cursor:pointer}
+.node:focus{outline:none}
+.node:focus-visible .pill,.node:focus-visible .dot{stroke-width:3.5}
+.pill{fill:var(--surface);stroke:var(--c);stroke-width:1.5}
+.plbl{font-weight:600;font-size:13.5px;fill:var(--text)}
+.pcount{font-weight:400;font-size:12px;fill:var(--muted)}
+.node.collapsed .pill{fill:color-mix(in srgb,var(--c) 11%,var(--surface));stroke:color-mix(in srgb,var(--c) 55%,var(--surface))}
+.node.collapsed .plbl{fill:var(--c)}
+.node.root .pill{fill:var(--text);stroke:var(--text)}
+.node.root .plbl{fill:var(--surface);font-size:15px}
+.node.root .pcount{fill:var(--surface);opacity:.7}
+.node.outpill .pill{fill:var(--surface);stroke:var(--line);stroke-dasharray:4 4}
+.node.outpill .plbl,.node.outpill .pcount{fill:var(--muted)}
+.dot{fill:var(--surface);stroke:var(--c);stroke-width:1.75}
+.check{fill:none;stroke:var(--surface);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.node.done .dot{fill:var(--c)}
+.node.done .check{opacity:1}
+.lbl{font-size:14px;fill:var(--text);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.node.hot .lbl{font-weight:700}
+.node.done .lbl{fill:var(--muted)}
+.more{font-size:11.5px;font-weight:600;fill:var(--muted)}
+.node.out .dot{stroke-dasharray:3 3;stroke:var(--muted)}
+.node.out .lbl{fill:var(--muted)}
+.ddot{fill:var(--c);opacity:.45}
+.dlbl{font-size:12.5px;fill:var(--muted);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.here{font-size:11px;font-weight:600;fill:var(--here);paint-order:stroke;stroke:var(--surface);stroke-width:4px}
+.pulse{fill:none;stroke:var(--here);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:pulse 2s ease-out infinite}
+@keyframes pulse{from{transform:scale(1);opacity:.7}to{transform:scale(2.6);opacity:0}}
+
+.panel{position:absolute;top:14px;right:14px;width:320px;max-height:calc(100% - 28px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 18px 20px;box-shadow:0 12px 32px -16px rgba(16,24,40,.3)}
+.panel[hidden]{display:none}
+.panel .close{position:absolute;top:10px;right:10px;border:0;background:none;color:var(--muted);font-size:.82rem;font-weight:600;padding:5px 8px;border-radius:8px}
+.panel .close:hover{background:var(--soft);color:var(--text)}
+.panel .crumb{font-size:.78rem;color:var(--muted);margin-right:56px}
+.panel h3{font-size:1.25rem;margin:.3rem 0 .6rem}
+.panel .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{font-size:.76rem;background:var(--soft);border-radius:6px;padding:3px 8px;color:var(--muted);font-weight:500}
+.chip.hot{background:color-mix(in srgb,var(--hot) 22%,var(--surface));color:var(--text)}
+.panel p{margin:.4rem 0 .8rem;font-size:.93rem;line-height:1.55}
+.panel .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.panel ul{padding-left:1.1rem;margin:.2rem 0 .8rem;font-size:.9rem;color:var(--muted)}
+.panel li{margin:.15rem 0}
+
+/* Roadmap */
+.rm-intro{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:end;margin-bottom:24px}
+.rm-intro h2{font-size:clamp(1.5rem,3vw,1.9rem)}
+.rm-intro p{margin:.4rem 0 0;color:var(--muted);max-width:60ch;font-size:.97rem}
+.roadmap{position:relative}
+.roadmap::before{content:"";position:absolute;left:19px;top:24px;bottom:24px;width:2px;background:var(--line)}
+.phase{position:relative;padding-left:60px;margin-bottom:12px}
+.ph-head{width:100%;display:flex;align-items:center;gap:14px;flex-wrap:wrap;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;color:var(--text)}
+.ph-head:hover{border-color:color-mix(in srgb,var(--muted) 50%,var(--line))}
+.ph-num{position:absolute;left:0;top:10px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--bg);border:1.5px solid var(--line);font-weight:700;font-size:1rem;color:var(--muted)}
+.phase.is-current .ph-num{border-color:var(--here);color:var(--here)}
+.phase.complete .ph-num{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.ph-title{display:flex;flex-direction:column;flex:1 1 220px}
+.ph-name{font-weight:700;font-size:1.08rem}
+.ph-period{color:var(--muted);font-size:.86rem}
+.tag-here{background:color-mix(in srgb,var(--here) 12%,var(--surface));color:var(--here);font-weight:600;font-size:.76rem;border-radius:99px;padding:3px 10px}
+.ph-prog{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);min-width:140px}
+.ph-prog .bar{flex:1;min-width:70px}
+.chev{width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:0 4px 4px;transition:transform .2s}
+.phase.open .chev{transform:rotate(-135deg);margin-bottom:-3px}
+.ph-body{display:none;padding:18px 2px 8px}
+.phase.open .ph-body{display:block}
+.goal{margin:0 0 .3rem;max-width:72ch}
+.routine{margin:0 0 1.2rem;color:var(--muted);max-width:72ch;font-size:.94rem}
+.branches{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;align-items:start}
+.branch{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:16px 18px 10px}
+.branch h4{font-size:1rem;display:flex;align-items:center;gap:8px;color:var(--text)}
+.branch h4::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
+.branch h4 span{margin-left:auto;font-weight:400;font-size:.8rem;color:var(--muted)}
+.sub{margin-top:14px}
+.sub h5{font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:6px}
+.sub ul{list-style:none;margin:0 0 4px 5px;padding:0 0 0 14px;border-left:1.5px solid color-mix(in srgb,var(--c) 28%,transparent)}
+.sub li{position:relative;padding:4px 0}
+.sub li::before{content:"";position:absolute;left:-14px;top:17px;width:9px;border-top:1.5px solid color-mix(in srgb,var(--c) 28%,transparent)}
+.sub label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.sub input{position:absolute;opacity:0;width:20px;height:20px;margin:0}
+.box{flex:none;width:17px;height:17px;margin-top:4px;border:1.5px solid color-mix(in srgb,var(--c) 70%,var(--surface));border-radius:5px;background:var(--surface);display:grid;place-items:center}
+.sub input:checked + .box{background:var(--c);border-color:var(--c)}
+.sub input:checked + .box::after{content:"";width:4px;height:8px;border:solid var(--surface);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.sub input:focus-visible + .box{outline:2px solid var(--focus);outline-offset:2px}
+.txt{display:flex;flex-direction:column;gap:1px}
+.nm{font-size:.95rem;line-height:1.45}
+.sub input:checked ~ .txt .nm{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.txt small{color:var(--muted);font-size:.82rem;line-height:1.45}
+.txt small.inc{opacity:.8}
+.here-li .nm::after{content:"você está aqui";margin-left:8px;font-size:.72rem;font-weight:600;color:var(--here);white-space:nowrap}
+.checkpoint{margin-top:16px;background:var(--soft);border-radius:12px;padding:12px 16px;max-width:78ch;font-size:.94rem}
+.outbox{margin:32px 0 0 60px;border:1px dashed var(--line);border-radius:14px;padding:18px 20px}
+.outbox h3{font-size:1.05rem;margin-bottom:.3rem}
+.outbox p{margin:0 0 .6rem;color:var(--muted);font-size:.93rem}
+.outbox ul{margin:0;padding-left:1.1rem;font-size:.93rem}
+.outbox li{margin:.35rem 0}
+
+/* Prova */
+.prose{max-width:700px}
+.prose h2{font-size:clamp(1.5rem,3vw,1.9rem);margin-bottom:.8rem}
+.prose h3{font-size:1.15rem;margin:2.2rem 0 .5rem}
+.prose p{margin:.55rem 0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:1.2rem 0}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.fact b{font-size:1.7rem;font-weight:700;display:block;line-height:1.15;letter-spacing:-.02em}
+.fact span{color:var(--muted);font-size:.86rem;line-height:1.4;display:block;margin-top:4px}
+.steps{counter-reset:s;padding:0;list-style:none}
+.steps li{counter-increment:s;position:relative;padding:5px 0 5px 36px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:7px;width:24px;height:24px;border-radius:50%;background:var(--soft);color:var(--text);display:grid;place-items:center;font-weight:600;font-size:.8rem}
+.note{color:var(--muted);font-size:.9rem}
+.reset{margin-top:2.4rem}
+
+/* Tempo e técnicas */
+.calc{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:1rem 0 .6rem}
+.calc-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:.94rem;margin-top:6px}
+.calc-row output{font-weight:700}
+.calc input[type=range]{width:100%;accent-color:var(--ink);margin:6px 0 12px}
+.calc-result{border-top:1px solid var(--line);padding-top:14px;margin-top:4px}
+.calc-result b{display:block;font-size:1.7rem;letter-spacing:-.02em;line-height:1.2}
+.calc-result p{margin:.6rem 0 0}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:1rem 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.card h4{font-size:1rem;margin-bottom:.3rem}
+.card p{margin:0;color:var(--muted);font-size:.94rem}
+.tech{display:flex;flex-direction:column;gap:10px;margin:1rem 0}
+.t{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+.t-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.t h4{font-size:1rem}
+.t p{margin:.35rem 0 0;font-size:.94rem;color:var(--muted)}
+.ev{font-size:.74rem;font-weight:600;border-radius:6px;padding:2px 8px;background:var(--soft);color:var(--muted)}
+.ev.hi{background:color-mix(in srgb,var(--fis) 14%,var(--surface));color:var(--fis)}
+.ev.mid{background:color-mix(in srgb,var(--ink) 12%,var(--surface));color:var(--ink)}
+
+@media (max-width:760px){
+  body{font-size:16px}
+  .wrap{padding:0 18px}
+  .hero{grid-template-columns:1fr;padding-top:24px;gap:18px}
+  .bar-top .wrap{gap:10px}
+  .tabs{overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+  .tabs a{padding:7px 11px;font-size:.86rem}
+  .overall{font-size:.78rem}
+  .overall .bar{display:none}
+  .hint{display:none}
+  .panel{position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;max-height:62svh;border-radius:18px 18px 0 0;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:20}
+  .phase{padding-left:50px}
+  .ph-num{width:34px;height:34px;font-size:.9rem;top:12px}
+  .roadmap::before{left:16px}
+  .outbox{margin-left:0}
+}
+@media (prefers-reduced-motion: reduce){
+  .pulse{animation:none;opacity:.45;transform:scale(1.7)}
+  .bar i,.chev{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <h1>Rumo à Fuvest</h1>
+      <p>Seu mapa de estudos com foco em matemática, física e química, sem largar redação, linguagens e conhecimentos gerais. Alvo: Vestibular 2028, com 1ª fase prevista para novembro de 2027.</p>
+    </div>
+    <div class="here-card">
+      <div class="pow" aria-hidden="true">a<sup>n</sup></div>
+      <div><strong>Você está em potenciação, a primeira estação da fase 1.</strong><span id="weeks"></span></div>
+    </div>
+  </header>
+</div>
+
+<nav class="bar-top" aria-label="Seções">
+  <div class="wrap">
+    <div class="tabs">
+      <a href="#mapa" data-view="mapa">Mapa mental</a>
+      <a href="#roadmap" data-view="roadmap">Roadmap</a>
+      <a href="#prova" data-view="prova">A prova e o método</a>
+      <a href="#tempo" data-view="tempo">Tempo e técnicas</a>
+    </div>
+    <div class="overall"><span class="bar"><i id="ov-bar" style="width:0%"></i></span><span id="ov-txt"></span></div>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section class="view" id="view-mapa" aria-label="Mapa mental">
+    <div class="map-tools">
+      <div class="btns">
+        <button class="btn" id="b-expand">Expandir tudo</button>
+        <button class="btn" id="b-collapse">Recolher</button>
+        <button class="btn" id="b-fit">Ajustar à tela</button>
+        <button class="btn" id="b-here">Onde estou</button>
+      </div>
+      <div class="legend">
+        <span class="lg"><span class="dot"></span>a estudar</span>
+        <span class="lg"><span class="dot f"></span>estudado</span>
+        <span class="lg"><span class="hotdot"></span><b style="font-weight:700;color:var(--text)">negrito</b> cai muito</span>
+        <span class="lg"><b style="color:var(--text);font-weight:600">+3</b> subtópicos</span>
+        <span class="lg"><span class="dot o"></span>fora do programa</span>
+      </div>
+    </div>
+    <div class="map-box" id="map-box">
+      <svg id="map" role="img" aria-label="Mapa mental dos conteúdos da Fuvest"></svg>
+      <span class="hint">Clique para abrir ramos e subtópicos. Arraste e use a roda do mouse ou pinça para navegar.</span>
+      <aside class="panel" id="panel" hidden aria-live="polite">
+        <button class="close" id="panel-close">Fechar</button>
+        <div id="panel-body"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="view" id="view-roadmap" aria-label="Roadmap">
+    <div class="rm-intro">
+      <div>
+        <h2>Roadmap em 6 fases</h2>
+        <p>Cada fase se abre em ramos por matéria. Marque o que já estudou: o progresso aparece aqui e no mapa mental. Os tópicos em negrito, com ponto amarelo, são os que mais caem.</p>
+      </div>
+      <div class="btns">
+        <button class="btn" id="b-open-all">Abrir todas</button>
+        <button class="btn" id="b-close-all">Fechar todas</button>
+      </div>
+    </div>
+    <div class="roadmap" id="roadmap"></div>
+  </section>
+
+  <section class="view" id="view-prova" aria-label="A prova e o método">
+    <div class="prose">
+      <h2>Como é a prova</h2>
+      <div class="facts">
+        <div class="fact"><b>80</b><span>questões de múltipla escolha na 1ª fase, com 5 alternativas</span></div>
+        <div class="fact"><b>5 h</b><span>de prova na 1ª fase, cerca de 3 min e 45 s por questão</span></div>
+        <div class="fact"><b>18</b><span>discursivas na 2ª fase a partir de 2028, mais a redação</span></div>
+      </div>
+      <p>A 1ª fase passou de 90 para 80 questões no Vestibular 2027, mantendo o mesmo tempo. A Fuvest diz que a ideia é dar mais tempo para questões que misturam áreas. Na prática, uma questão de física pode exigir leitura de gráfico, potência de 10 e interpretação de texto ao mesmo tempo.</p>
+      <h3>2ª fase no modelo de 2028</h3>
+      <p>No primeiro dia: 8 questões discursivas de linguagens (português, literatura, inglês, arte e educação física) e a redação. No segundo dia: 10 questões discursivas organizadas por área, em seis tipos de prova. Quem vai para exatas costuma cair no tipo de matemática ou no tipo que junta matemática e ciências da natureza, mas isso depende do curso.</p>
+      <p><a href="https://www.fuvest.br/wp-content/uploads/fuvest2028-fase2-tipos-prova.pdf" target="_blank" rel="noopener">Confira na lista oficial qual é o tipo de prova do seu curso</a>. O programa completo de cada matéria está no <a href="https://www.fuvest.br/wp-content/uploads/fuvest2027-guia-provas-programas.pdf" target="_blank" rel="noopener">guia de programas da Fuvest</a>.</p>
+      <h3>Redação e leituras</h3>
+      <p>Desde 2026 a redação traz uma única coletânea de textos com duas propostas. Até o Vestibular 2028, a lista de leituras obrigatórias tem só autoras de língua portuguesa; confira a lista completa no site da Fuvest.</p>
+      <h3>O que mais cai em exatas</h3>
+      <p>Nos levantamentos de provas antigas, lideram em matemática: matemática básica (porcentagem, razão e proporção, regra de três, equações), funções, geometria plana, geometria espacial e trigonometria. Em física: trabalho e energia, cinemática, ondulatória, óptica, termologia e eletrodinâmica. Em química: química geral e físico-química.</p>
+      <h3>O que caiu de exatas na Fuvest 2027</h3>
+      <p>Matemática teve 6 questões próprias: trigonometria (inclinação de telhado), progressão geométrica, estudo de função, duas de análise combinatória (uma com simetria) e uma de distância sobre um paralelo, que foi anulada. A matemática também apareceu como ferramenta em geografia, inglês e biologia.</p>
+      <p>Física teve 8: circuito com duas fontes, conservação de energia em carro elétrico, custo de energia elétrica contra gasolina, rampa de skate (energia e força no ponto mais baixo), equilíbrio térmico, tensão de Hubble e astrofísica ligada a uma leitura obrigatória.</p>
+      <p>Química teve 9: forças intermoleculares, evaporação e estequiometria do etanol, combustão, cinética e termodinâmica, surfactantes, tabela periódica, césio-137 e pH.</p>
+      <h3>Integral, somatório e número de Euler caem?</h3>
+      <p>Integral e derivada não estão no programa oficial da Fuvest. O que pode aparecer é a ideia por trás delas: a área sob o gráfico v × t é o deslocamento, e a inclinação do gráfico é a taxa de variação. Números complexos, matrizes, determinantes e cônicas também ficaram fora do programa atual.</p>
+      <p>Somatório não aparece como tópico próprio, mas a notação Σ pode surgir em soma de PA e PG e em fórmulas de estatística, como média e variância. Vale saber ler.</p>
+      <p>O número e não é citado no programa, mas exponencial e logaritmo são. Se uma questão usar e ou ln, o enunciado costuma dar os valores; você precisa saber as propriedades. Já a relação de Euler dos poliedros (V − A + F = 2) faz parte de geometria espacial e cai.</p>
+      <h3>Método para exatas</h3>
+      <ol class="steps">
+        <li>Teoria curta: 30 a 40 minutos de aula ou leitura por tópico, com resumo de uma página feito por você.</li>
+        <li>Exercícios em escada: fáceis para fixar, médios para treinar, e depois questões da própria Fuvest sobre o tema.</li>
+        <li>Caderno de erros: toda questão errada vai para ele com o motivo do erro (conta, conceito ou interpretação).</li>
+        <li>Revisão espaçada: refaça os erros depois de 1, 7 e 30 dias.</li>
+        <li>Sem calculadora: treine contas à mão e estimativas desde já, como na prova.</li>
+        <li>Na 2ª fase, escreva a resolução inteira: o raciocínio conta, não só a resposta.</li>
+      </ol>
+      <h3>Por onde começar de graça</h3>
+      <p>Provas e gabaritos antigos estão no <a href="https://www.fuvest.br" target="_blank" rel="noopener">site da Fuvest</a>. Para a base de matemática, o Portal da OBMEP (portaldaobmep.impa.br) e a Khan Academy em português têm aulas e exercícios de potenciação, frações e equações.</p>
+      <p class="note">Datas de 2027 ainda não foram divulgadas; as fases do roadmap usam como referência o calendário de 2026 (1ª fase em 1º de novembro e 2ª fase em 6 e 7 de dezembro).</p>
+      <div class="reset"><button class="btn" id="b-reset">Zerar meu progresso</button></div>
+    </div>
+  </section>
+  <section class="view" id="view-tempo" aria-label="Tempo e técnicas">
+    <div class="prose">
+      <h2>Quanto tempo leva</h2>
+      <p>Você está começando em potenciação e tem cerca de 49 semanas até a 1ª fase de 2027. Para saber o tamanho do desafio, veja quantos pontos de 80 foram precisos para passar para a 2ª fase na Fuvest 2027:</p>
+      <div class="facts">
+        <div class="fact"><b>68</b><span>Medicina</span></div>
+        <div class="fact"><b>62</b><span>Engenharia Aeronáutica</span></div>
+        <div class="fact"><b>57</b><span>Engenharia Elétrica e de Computação</span></div>
+        <div class="fact"><b>57</b><span>Engenharia Mecânica, Mecatrônica e de Produção</span></div>
+      </div>
+      <p class="note">Notas de corte da 1ª fase em ampla concorrência. Os pontos são da prova inteira, não só de exatas.</p>
+      <p>Uma engenharia concorrida pede algo como 57 a 62 acertos em 80, ou seja, uns 70% a 78% da prova. Com 4 a 5 horas líquidas por dia, 6 dias por semana e estudo ativo (resolvendo questões, não relendo), dá para chegar competitivo em novembro de 2027. Para os cortes mais altos, muita gente leva dois anos. Se 2028 não vier, o segundo ano anda muito mais rápido, porque a base já estará pronta. Faça a prova de 2028 de qualquer jeito: é o melhor treino que existe.</p>
+
+      <h3>Calcule as suas horas</h3>
+      <div class="calc">
+        <div class="calc-row"><label for="c-h">Horas líquidas de estudo por dia</label><output id="c-h-out">4 h</output></div>
+        <input type="range" id="c-h" min="1" max="10" step="0.5" value="4">
+        <div class="calc-row"><label for="c-d">Dias de estudo por semana</label><output id="c-d-out">6</output></div>
+        <input type="range" id="c-d" min="3" max="7" step="1" value="6">
+        <div class="calc-result"><b id="c-total"></b><span class="note">até a 1ª fase, estimada para 1º de novembro de 2027</span><p id="c-msg"></p></div>
+      </div>
+      <p class="note">As faixas da calculadora são uma regra de bolso, não uma garantia. O que mais pesa é a qualidade das horas.</p>
+
+      <h3>Quantas horas por dia</h3>
+      <div class="duo">
+        <div class="card"><h4>Se você ainda está na escola</h4><p>3 a 4 horas líquidas nos dias de aula, 5 a 6 horas no sábado e um dia leve, com só uma revisão curta ou folga.</p></div>
+        <div class="card"><h4>Se você só estuda para o vestibular</h4><p>6 a 8 horas líquidas por dia, contando as aulas. Acima disso o rendimento costuma cair.</p></div>
+      </div>
+      <p>Horas líquidas são as horas de estudo de verdade: celular longe e você resolvendo, explicando ou revisando. Trabalhe em blocos de 50 minutos com 10 de pausa e comece o dia pela matéria mais difícil, enquanto a cabeça está descansada.</p>
+
+      <h3>Um dia modelo de 4 horas</h3>
+      <ol class="steps">
+        <li>10 minutos de revisão espaçada: os flashcards e os erros que vencem hoje.</li>
+        <li>50 minutos de teoria nova de matemática, curta, com exemplos resolvidos.</li>
+        <li>50 minutos de exercícios do mesmo tema, do fácil para o difícil.</li>
+        <li>50 minutos de física ou química: teoria curta e questões.</li>
+        <li>40 minutos de questões misturadas de temas antigos e caderno de erros.</li>
+      </ol>
+      <p>No sábado, troque por redação e uma prova antiga ou simulado. No domingo, descanse.</p>
+
+      <h3>Técnicas que mais fazem o cérebro reter</h3>
+      <p>A ordem segue a força das evidências da pesquisa em psicologia cognitiva.</p>
+      <div class="tech">
+        <div class="t"><div class="t-head"><h4>Testar-se</h4><span class="ev hi">evidência alta</span></div><p>Lembrar sem olhar é o que fixa. Feche o caderno e resolva; escreva numa folha em branco tudo o que lembra de um tema; use flashcards para propriedades e fórmulas, como as de potenciação.</p></div>
+        <div class="t"><div class="t-head"><h4>Espaçar as revisões</h4><span class="ev hi">evidência alta</span></div><p>Revise o mesmo assunto depois de 1, 7 e 30 dias, em vez de estudar tudo de uma vez. O Anki, grátis no computador e no Android, agenda isso sozinho.</p></div>
+        <div class="t"><div class="t-head"><h4>Misturar tipos de questão</h4><span class="ev mid">evidência moderada</span></div><p>Depois de aprender PA, PG e exponencial, resolva listas misturadas. Na prova ninguém avisa qual é o tema, e escolher o método certo também se treina.</p></div>
+        <div class="t"><div class="t-head"><h4>Explicar para si mesmo</h4><span class="ev mid">evidência moderada</span></div><p>A cada passo de uma resolução, diga por que ele vale. Tente ensinar o tema em voz alta, como se fosse para um amigo: onde você travar é onde falta entender.</p></div>
+        <div class="t"><div class="t-head"><h4>Exemplo resolvido, depois sozinho</h4><span class="ev ok">boa prática</span></div><p>Estude uma resolução, esconda e refaça. Depois resolva um problema parecido e, por fim, um diferente. Funciona muito bem para quem está começando um assunto.</p></div>
+      </div>
+
+      <h3>O que rende pouco</h3>
+      <p>Reler, grifar e fazer resumos longos dão sensação de estudo, mas fixam pouco. Assistir aula sem resolver nada depois também. Troque a releitura por questões.</p>
+
+      <h3>Cuidar do cérebro</h3>
+      <p>O sono é quando a memória do dia se consolida, então dormir 8 a 9 horas faz parte do estudo, não compete com ele. Exercício físico ajuda na atenção e no humor. Deixe o celular em outro cômodo durante os blocos e faça pausas de verdade, longe da tela.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+"use strict";
+// ---------- Dados ----------
+const P = (name, phase, pr, tip, sub) => ({name, phase, pr, tip: tip || "", sub: sub || null});
+const O = (name, tip) => ({name, phase: 0, pr: 0, tip, out: true, sub: null});
+const DATA = {name:"Fuvest 2028", children:[
+ {name:"Matemática", key:"mat", children:[
+  {name:"Matemática básica", children:[
+   P("Potenciação",1,3,"Base de exponencial, logaritmo, notação científica, pH e meia-vida.",["Produto e quociente de mesma base","Potência de potência","Expoente zero e negativo","Expoente fracionário","Potências de 10","Base negativa e sinais"]),
+   P("Radiciação e racionalização",1,3,"Raiz é potência de expoente fracionário.",["Raiz como potência","Simplificação de radicais","Racionalização de denominadores"]),
+   P("Notação científica",1,2,"Aparece o tempo todo em física e química.",["Escrever e converter","Operar com potências de 10","Ordem de grandeza"]),
+   P("Frações, decimais e dízimas",1,3,"Treine sem calculadora, que não é permitida na prova.",["Operações com frações","Fração geratriz de dízimas","Comparar números"]),
+   P("Produtos notáveis e fatoração",1,3,"",["Quadrado da soma e da diferença","Diferença de quadrados","Cubo da soma","Fator comum e agrupamento"]),
+   P("Equações do 1º grau e sistemas",1,3,"O mais cobrado é transformar o texto em equação.",["Montar a equação pelo texto","Sistemas 2×2: substituição e adição"]),
+   P("Equações do 2º grau",1,3,"",["Fórmula de Bhaskara","Soma e produto das raízes","Discriminante","Equações biquadradas"]),
+   P("Razão, proporção e regra de três",1,3,"Proporcionalidade aparece em todas as áreas.",["Direta e inversamente proporcionais","Regra de três composta","Escalas","Grandezas compostas (velocidade, densidade)"]),
+   P("Porcentagem e juros",1,3,"Aumentos e descontos sucessivos: multiplique os fatores.",["Aumentos e descontos sucessivos","Juros simples","Juros compostos","Taxas e índices socioeconômicos"]),
+   P("Divisibilidade, MMC e MDC",1,2,"",["Números primos e fatoração","MMC e MDC","Restos e ciclos"]),
+   P("Algarismos significativos e arredondamento",1,2,"Está no programa oficial, junto com noção de erro em medições.",["Algarismos significativos","Arredondamento","Erro em medições"]),
+   P("Bases de numeração",1,1,"O programa cita base binária e sexagesimal.",["Base binária","Base sexagesimal (horas e ângulos)"]),
+   P("Conjuntos e intervalos",1,1,"")
+  ]},
+  {name:"Funções", children:[
+   P("Conceito de função e leitura de gráficos",2,3,"Em 2027 caiu um estudo de função com uma constante.",["Domínio e imagem","Crescimento e decrescimento","Zeros e sinal","Tabelas e gráficos"]),
+   P("Função afim",2,3,"",["Coeficiente angular","Gráfico e raiz","Modelagem linear"]),
+   P("Função quadrática: máximo e mínimo",2,3,"",["Raízes e gráfico","Concavidade","Vértice: máximo e mínimo","Otimização"]),
+   P("Inequações",2,2,"",["Estudo de sinal","Produto e quociente"]),
+   P("Funções definidas por partes",2,2,"",["Tarifas por faixa","Gráficos com várias sentenças"]),
+   P("Função exponencial",2,3,"Continuação direta da potenciação.",["Crescimento e decaimento","Juros compostos","Equações exponenciais","Meia-vida"]),
+   P("Logaritmos",2,3,"",["Definição e propriedades","Mudança de base","Equações logarítmicas","Escalas: pH, decibéis, Richter","Número e e ln: usar quando o enunciado der o valor"]),
+   P("Função modular",2,2,"",["Valor absoluto","Equações e inequações modulares"]),
+   P("Funções racionais simples",2,1,"Numerador e denominador de grau até 2, segundo o programa.",["Proporcionalidade inversa","Comportamento do gráfico"]),
+   P("Função composta e inversa",2,2,"")
+  ]},
+  {name:"Sequências", children:[
+   P("Progressão aritmética",2,2,"",["Termo geral","Soma dos termos","PA e função afim","Notação de somatório (Σ)"]),
+   P("Progressão geométrica",2,3,"Caiu em 2027 numa pontuação de campeonato.",["Termo geral","Soma finita","Soma infinita","PG e função exponencial"])
+  ]},
+  {name:"Geometria plana", children:[
+   P("Ângulos, paralelas e triângulos",3,3,"",["Ângulos em paralelas","Soma dos ângulos internos","Congruência","Pontos notáveis"]),
+   P("Semelhança e Teorema de Tales",3,3,"",["Casos de semelhança","Teorema de Tales","Razão entre áreas"]),
+   P("Pitágoras e relações métricas",3,3,"",["Relações no triângulo retângulo","Diagonais e alturas"]),
+   P("Áreas de figuras planas",3,3,"",["Triângulos e quadriláteros","Área por decomposição","Setor circular"]),
+   P("Circunferência e círculo",3,3,"",["Ângulo central e inscrito","Cordas, secantes e tangentes","Comprimento de arco"]),
+   P("Polígonos regulares e pavimentações",3,2,"",["Inscritos e circunscritos","Ângulos e diagonais","Ladrilhamentos do plano"]),
+   P("Simetrias e transformações",3,2,"Em 2027 uma questão de contagem com simetria teve só 15% de acerto.",["Simetrias","Translação, reflexão e rotação","Homotetia: ampliação e redução"])
+  ]},
+  {name:"Trigonometria", children:[
+   P("Trigonometria no triângulo retângulo",3,3,"Em 2027 caiu a inclinação de um telhado.",["Seno, cosseno e tangente","Ângulos notáveis","Inclinação e rampas"]),
+   P("Lei dos senos e dos cossenos",3,3,"",["Lei dos senos","Lei dos cossenos","Área com seno"]),
+   P("Ciclo trigonométrico e radianos",3,2,"",["Graus e radianos","Redução ao 1º quadrante","Relação fundamental"]),
+   P("Funções e equações trigonométricas",3,2,"",["Gráficos de seno e cosseno","Período e amplitude","Fenômenos periódicos","Equações trigonométricas"])
+  ]},
+  {name:"Geometria espacial", children:[
+   P("Prismas e pirâmides",3,3,"",["Áreas e volumes","Troncos de pirâmide"]),
+   P("Cilindro, cone e esfera",3,3,"",["Áreas e volumes","Tronco de cone","Esfera, paralelos e meridianos"]),
+   P("Poliedros, vistas e planificações",3,2,"",["Relação de Euler: V − A + F = 2","Planificações","Vistas ortogonais"]),
+   P("Sólidos inscritos e semelhança",3,2,"A razão entre volumes é o cubo da razão de semelhança.",["Razão de volumes","Inscrição e circunscrição"])
+  ]},
+  {name:"Contagem e probabilidade", children:[
+   P("Princípio fundamental da contagem",3,3,"",["Princípio multiplicativo","Princípio aditivo","Diagrama de árvore"]),
+   P("Permutações, arranjos e combinações",3,3,"Caiu duas vezes em 2027, com baixo índice de acerto.",["Permutações com repetição","Arranjos","Combinações","Casos equivalentes por simetria"]),
+   P("Probabilidade",3,3,"",["Espaço amostral","União e interseção","Probabilidade condicional","Eventos independentes","Espaços contínuos (geométrica)"])
+  ]},
+  {name:"Estatística", children:[
+   P("Média, mediana e moda",4,3,"",["Média aritmética e ponderada","Mediana e moda"]),
+   P("Dispersão: variância e desvio padrão",4,2,"",["Amplitude","Variância","Desvio padrão","Coeficiente de variação"]),
+   P("Quartis, percentis e gráficos",4,2,"",["Quartis, decis e percentis","Box-plot","Histograma e ramos e folhas"]),
+   P("Amostragem e leitura de pesquisas",4,2,"",["População e amostra","Leitura crítica de pesquisas"])
+  ]},
+  {name:"Álgebra e analítica", children:[
+   P("Sistemas lineares até 3×3",4,2,"O programa limita a 3 equações e 3 incógnitas.",["Escalonamento","Possível, impossível ou indeterminado","Interpretação geométrica"]),
+   P("Geometria analítica: ponto e reta",4,2,"",["Distância entre pontos","Equação da reta","Paralelas e perpendiculares","Distância de ponto a reta"]),
+   P("Geometria analítica: circunferência",4,2,"",["Equação da circunferência","Posição de reta e circunferência"]),
+   P("Divisão de polinômios",4,1,"",["Divisão euclidiana","Fatoração de polinômios"])
+  ]},
+  {name:"Fora do programa atual", children:[
+   O("Cálculo: derivadas e integrais","Não está no programa da Fuvest. É matéria de faculdade. O que a prova cobra é a ideia por trás: área sob o gráfico v × t e taxa de variação."),
+   O("Números complexos","Não aparece no programa atual da Fuvest, que segue a BNCC."),
+   O("Matrizes e determinantes","O programa só pede sistemas lineares até 3×3, que se resolvem por escalonamento."),
+   O("Relações de Girard e equações de grau alto","Do bloco de polinômios, o programa só cita fatoração e divisão euclidiana."),
+   O("Cônicas: elipse, hipérbole e parábola","Na geometria analítica o programa só pede reta e circunferência.")
+  ]}
+ ]},
+ {name:"Física", key:"fis", children:[
+  {name:"Fundamentos", children:[
+   P("Unidades do SI e conversões",1,3,"km/h para m/s: divida por 3,6.",["Prefixos (mili, micro, quilo)","Conversões de velocidade","Análise dimensional"]),
+   P("Ordem de grandeza e estimativas",1,2,"Usa direto a potenciação."),
+   P("Vetores: soma e decomposição",1,3,"Base de toda a dinâmica.",["Regra do paralelogramo","Decomposição em x e y"]),
+   P("Leitura de gráficos e proporcionalidade",1,3,"")
+  ]},
+  {name:"Cinemática", children:[
+   P("Movimento uniforme e uniformemente variado",2,3,"",["Funções horárias","Equação de Torricelli","Gráficos s × t e v × t","Área do gráfico = deslocamento"]),
+   P("Queda livre e lançamentos",2,3,"",["Queda livre","Lançamento horizontal","Lançamento oblíquo"]),
+   P("Movimento circular",2,3,"",["Período e frequência","Velocidade angular","Polias e engrenagens"])
+  ]},
+  {name:"Dinâmica e energia", children:[
+   P("Leis de Newton",2,3,"",["Inércia","F = m · a","Ação e reação","Diagrama de forças"]),
+   P("Atrito e plano inclinado",2,3,"",["Atrito estático e cinético","Plano inclinado"]),
+   P("Força centrípeta",2,3,"Em 2027 caiu a força no ponto mais baixo de uma rampa de skate.",["Curvas","Pontos baixos e altos de trajetórias"]),
+   P("Trabalho e potência",2,3,"",["Trabalho de força constante","Trabalho pela área do gráfico","Potência e rendimento"]),
+   P("Energia mecânica e conservação",2,3,"O tema mais cobrado: caiu em duas questões em 2027.",["Energia cinética","Potencial gravitacional e elástica","Conservação","Sistemas dissipativos"]),
+   P("Impulso, quantidade de movimento e colisões",2,2,"",["Teorema do impulso","Conservação do momento","Colisões elásticas e inelásticas"])
+  ]},
+  {name:"Gravitação, estática e fluidos", children:[
+   P("Gravitação e leis de Kepler",3,2,"",["Lei da gravitação","Leis de Kepler","Satélites"]),
+   P("Estática e torque",3,2,"",["Equilíbrio do ponto","Torque e alavancas"]),
+   P("Hidrostática: pressão e empuxo",3,2,"",["Pressão e Stevin","Princípio de Pascal","Empuxo"]),
+   P("Hidrodinâmica: vazão e continuidade",3,1,"",["Vazão","Equação da continuidade"])
+  ]},
+  {name:"Termologia", children:[
+   P("Termometria e dilatação",3,2,"",["Escalas Celsius, Fahrenheit e Kelvin","Dilatação linear e volumétrica"]),
+   P("Calorimetria e equilíbrio térmico",3,3,"Em 2027 a questão do isopor com gelo teve 11% de acerto.",["Calor sensível e latente","Equilíbrio térmico","Curvas de aquecimento"]),
+   P("Transmissão de calor",3,2,"",["Condução","Convecção","Radiação"]),
+   P("Gases e termodinâmica",3,3,"",["Gases ideais","1ª lei","Ciclos e rendimento","2ª lei e máquinas térmicas","Motores a combustão"]),
+   P("Efeito estufa e aquecimento global",3,2,"",["Balanço de radiação","Aquecimento global"])
+  ]},
+  {name:"Óptica", children:[
+   P("Reflexão e espelhos",3,3,"",["Espelhos planos","Espelhos esféricos"]),
+   P("Refração",3,3,"",["Índice de refração","Lei de Snell","Reflexão total e fibra óptica"]),
+   P("Lentes e instrumentos ópticos",3,3,"",["Convergentes e divergentes","Equação de Gauss","Olho humano"])
+  ]},
+  {name:"Ondulatória", children:[
+   P("Equação fundamental v = λf",3,3,"",["Comprimento de onda","Período e frequência"]),
+   P("MHS e pêndulo",3,2,"",["Massa-mola","Pêndulo simples"]),
+   P("Fenômenos ondulatórios",3,2,"",["Interferência","Difração","Ressonância","Efeito Doppler"]),
+   P("Som, notas musicais e decibéis",3,2,"A escala em decibéis usa logaritmo.",["Altura, intensidade e timbre","Notas musicais","Nível sonoro em dB","Cordas e tubos"]),
+   P("Espectro eletromagnético",3,2,"",["Faixas: rádio a raios gama","Usos e riscos das radiações"])
+  ]},
+  {name:"Eletricidade", children:[
+   P("Eletrostática: Coulomb, campo e potencial",4,2,"",["Eletrização","Lei de Coulomb","Campo e potencial"]),
+   P("Corrente e Lei de Ohm",4,3,"",["Corrente elétrica","1ª e 2ª leis de Ohm"]),
+   P("Circuitos e associação de resistores",4,3,"Em 2027 caiu um circuito com duas fontes, com 27% de acerto.",["Série e paralelo","Circuitos com mais de uma fonte","Amperímetro e voltímetro"]),
+   P("Potência, consumo e custo de energia",4,3,"Em 2027 caiu o custo de um carro elétrico contra um a gasolina.",["P = U · i","Consumo em kWh","Comparação de custos"]),
+   P("Geração de energia e matriz energética",4,3,"",["Hidrelétrica, térmica, nuclear, solar e eólica","Matriz energética","Eficiência"]),
+   P("Semicondutores e transistores",4,1,"",["Condutores, isolantes e semicondutores","Transistores e chips"])
+  ]},
+  {name:"Magnetismo", children:[
+   P("Campo magnético",4,2,"",["Ímãs","Campo de fio e de espira"]),
+   P("Força magnética",4,2,"",["Força em carga e em fio","Regra da mão direita"]),
+   P("Indução eletromagnética",4,2,"",["Lei de Faraday-Lenz","Geradores e transformadores"])
+  ]},
+  {name:"Física moderna e Universo", children:[
+   P("Efeito fotoelétrico e fótons",4,2,"",["E = h · f","Função trabalho"]),
+   P("Modelo de Bohr e espectroscopia",4,2,"",["Níveis de energia","Espectros de emissão e absorção"]),
+   P("Radioatividade e energia nuclear",4,2,"",["Alfa, beta e gama","Meia-vida","Fissão e fusão","Usinas e armas nucleares"]),
+   P("Cosmologia: Big Bang e expansão do Universo",4,2,"Em 2027 caiu a tensão de Hubble.",["Big Bang","Lei de Hubble"]),
+   P("Evolução estelar e origem dos elementos",4,2,"Em 2027 caiu ligada a Nebulosas, de Narcisa Amália.",["Vida e morte das estrelas","Origem dos elementos"]),
+   P("Relatividade e partículas (noções)",4,1,"")
+  ]}
+ ]},
+ {name:"Química", key:"qui", children:[
+  {name:"Química geral", children:[
+   P("Atomística e modelos atômicos",2,2,"",["Prótons, nêutrons e elétrons","Modelos de Dalton a Bohr","Isótopos"]),
+   P("Tabela periódica",2,2,"Em 2027 caiu uma tabela periódica em 3D.",["Famílias e períodos","Propriedades periódicas","Lantanídeos e actinídeos"]),
+   P("Ligações e geometria molecular",2,2,"",["Iônica, covalente e metálica","Geometria molecular","Polaridade"]),
+   P("Forças intermoleculares",2,3,"Em 2027 a questão de volatilidade teve 10% de acerto.",["Dipolo induzido, dipolo-dipolo e ligação de hidrogênio","Volatilidade e ebulição","Solubilidade e surfactantes"]),
+   P("Estados físicos e separação de misturas",2,2,""),
+   P("Funções inorgânicas",2,2,"",["Ácidos, bases, sais e óxidos","Neutralização"]),
+   P("Mol e estequiometria",2,3,"É regra de três com mols. Caiu em 2027 com consumo de etanol.",["Mol e massa molar","Constante de Avogadro","Leis ponderais","Reagente limitante e rendimento"])
+  ]},
+  {name:"Físico-química", children:[
+   P("Soluções e concentração",3,3,"",["g/L e mol/L","Diluição e mistura","ppm e título"]),
+   P("Propriedades coligativas",3,1,"",["Pressão osmótica","Ebulioscopia e crioscopia"]),
+   P("Termoquímica",3,2,"",["Endo e exotérmico","Entalpia e Lei de Hess","Energia de ligação"]),
+   P("Cinética química",3,2,"",["Fatores que alteram a velocidade","Energia de ativação e catalisadores"]),
+   P("Equilíbrio químico e pH",4,3,"pH usa logaritmo: revise log antes.",["Constante de equilíbrio","Le Chatelier","pH e pOH","Troca iônica"]),
+   P("Eletroquímica",4,2,"",["Pilhas","Eletrólise","Corrosão"]),
+   P("Química nuclear e rejeitos",4,2,"Em 2027 caiu a retenção de césio-137.",["Decaimento","Contaminação radioativa"])
+  ]},
+  {name:"Química orgânica", children:[
+   P("Funções orgânicas",4,2,"",["Hidrocarbonetos","Funções oxigenadas e nitrogenadas","Nomenclatura"]),
+   P("Isomeria",4,2,"",["Plana","Geométrica","Óptica"]),
+   P("Reações orgânicas",4,3,"",["Combustão","Substituição e adição","Esterificação e saponificação","Oxidação"]),
+   P("Polímeros e petroquímica",4,2,"",["Adição e condensação","Plásticos e petróleo"])
+  ]},
+  {name:"Química ambiental e industrial", children:[
+   P("Combustão e combustíveis",4,3,"Etanol caiu em duas questões em 2027.",["Etanol e gasolina","Combustão completa e incompleta","História: teoria do flogisto"]),
+   P("Ciclos biogeoquímicos",4,2,"",["Carbono","Nitrogênio e enxofre","Água"]),
+   P("Poluição e qualidade da água",4,2,"",["Chuva ácida","Poluição do ar","Agrotóxicos","Oxigênio dissolvido e tratamento de água"]),
+   P("Processos industriais",4,1,"O programa lista amônia, ácidos sulfúrico e nítrico, cloro, soda e cal.",["Amônia","Ácidos sulfúrico e nítrico","Cloro e soda cáustica","Cal"])
+  ]}
+ ]},
+ {name:"Redação", key:"red", children:[
+  {name:"Base", children:[
+   P("Estrutura do texto dissertativo",1,3,"Introdução com tese, desenvolvimento com argumentos, conclusão que retoma a tese."),
+   P("Ler a coletânea e formular uma tese",1,3,"")
+  ]},
+  {name:"Prática", children:[
+   P("Escrever 1 redação por semana",2,3,""),
+   P("Repertório: ciência, tecnologia e sociedade",2,2,"Seu estudo de exatas também vira repertório."),
+   P("Coesão e progressão argumentativa",2,2,""),
+   P("Escrever 2 redações por semana",3,3,""),
+   P("Treinar as duas propostas da mesma coletânea",3,3,"Desde 2026 a Fuvest dá uma coletânea com duas propostas."),
+   P("Reescrever redações corrigidas",4,3,""),
+   P("Redação cronometrada",5,3,"")
+  ]}
+ ]},
+ {name:"Linguagens", key:"lin", children:[
+  {name:"Português e inglês", children:[
+   P("Interpretação de texto",1,3,"A competência leitora é o tema mais cobrado da prova, até em exatas."),
+   P("Gramática aplicada à leitura",2,2,""),
+   P("Inglês: leitura e interpretação",2,2,"Em 2027 um texto em inglês falava de sequência geométrica.")
+  ]},
+  {name:"Leituras obrigatórias", children:[
+   P("Ler o primeiro terço da lista",2,3,"Em 2027 as nove obras caíram já na 1ª fase."),
+   P("Ler o segundo terço da lista",3,3,""),
+   P("Ler o último terço da lista",4,3,""),
+   P("Revisar as obras para a 2ª fase",6,3,"")
+  ]}
+ ]},
+ {name:"Conhecimentos gerais", key:"ger", children:[
+  {name:"Biologia", children:[
+   P("Ecologia e mudanças climáticas",2,3,""), P("Citologia e ciclo celular",2,2,""), P("Fisiologia humana",3,2,""),
+   P("Genética",4,3,"Probabilidade da matemática ajuda muito aqui."), P("Evolução e botânica",4,2,"")
+  ]},
+  {name:"História", children:[
+   P("Idade Moderna",2,2,""), P("Brasil Colônia e Império",3,2,""), P("Século XX",4,2,""), P("Antiguidade e África",4,1,"")
+  ]},
+  {name:"Geografia", children:[
+   P("Clima e relevo",2,2,""), P("Urbanização e população",3,2,""), P("Questões ambientais",3,2,""), P("Geopolítica",4,2,"")
+  ]},
+  {name:"Filosofia e sociologia", children:[
+   P("Teoria sociológica",3,2,""), P("Filosofia antiga e medieval",3,2,""), P("Filosofia moderna e contemporânea",4,1,"")
+  ]},
+  {name:"Atualidades", children:[
+   P("Ler notícias 2 vezes por semana",2,2,"Em 2027 caíram carro elétrico, IA e jornada 6x1."), P("Resumo mensal de atualidades",4,2,"")
+  ]}
+ ]},
+ {name:"Estratégia", key:"est", children:[
+  {name:"Organização", children:[
+   P("Montar um cronograma semanal fixo",1,3,""),
+   P("Conferir o tipo de prova da 2ª fase do seu curso",1,3,"Define se o segundo dia será de matemática, ciências da natureza ou as duas."),
+   P("Começar o caderno de erros",1,3,""),
+   P("Revisão espaçada: 1, 7 e 30 dias",2,3,"")
+  ]},
+  {name:"Treino com provas", children:[
+   P("Questões antigas da Fuvest por assunto",2,3,""),
+   P("Uma prova antiga completa por mês",3,3,""),
+   P("Pedir isenção ou redução da taxa",3,2,"Em 2026 o prazo foi de maio a julho; confira o calendário de 2027."),
+   P("Fazer a inscrição",4,3,"Em 2026 foi de agosto a outubro."),
+   P("Simulado de 80 questões em 5 h a cada 2 semanas",4,3,""),
+   P("Simulado semanal",5,3,""),
+   P("Revisar os temas que mais caem",5,3,"")
+  ]},
+  {name:"2ª fase", children:[
+   P("Escrever a resolução completa das questões",4,3,"Na discursiva, o raciocínio organizado vale pontos."),
+   P("Discursivas de matemática e ciências da natureza",6,3,""),
+   P("Provas antigas de 2ª fase cronometradas",6,3,"")
+  ]}
+ ]}
+]};
+
+const PHASES = [
+ {n:1,name:"Base sólida",period:"dez/2026 a jan/2027",start:"2026-12-01",
+  goal:"Deixar a matemática básica automática. Física e química dependem de potência, fração, equação e proporção, então este é o alicerce.",
+  routine:"Rotina semanal: matemática 50%, física 20%, redação e leitura 20%, organização 10%.",
+  checkpoint:"Resolver sem consulta listas de potenciação, fatoração e equações, e acertar a maioria das questões de matemática básica de provas antigas da Fuvest."},
+ {n:2,name:"Funções e mecânica",period:"fev a abr/2027",start:"2027-02-01",
+  goal:"Entrar no núcleo da prova: funções e sequências em matemática, cinemática, dinâmica e energia em física, e química geral.",
+  routine:"Rotina semanal: matemática 35%, física 30%, química 15%, redação e linguagens 10%, conhecimentos gerais 10%.",
+  checkpoint:"Ler e montar gráficos de funções e de movimento (s × t e v × t) e resolver problemas de energia sem olhar fórmulas."},
+ {n:3,name:"Geometria, calor e ondas",period:"mai a jul/2027",start:"2027-05-01",
+  goal:"Cobrir geometria plana, trigonometria, geometria espacial, contagem e probabilidade, além de termologia, óptica e ondulatória. Use julho para revisar as fases 1 e 2.",
+  routine:"Rotina semanal: matemática 35%, física 30%, química 15%, redação 10%, conhecimentos gerais 10%, mais uma prova antiga completa por mês.",
+  checkpoint:"Fazer uma prova antiga completa da 1ª fase e acertar mais da metade das questões de exatas."},
+ {n:4,name:"Álgebra, eletricidade e simulados",period:"ago a set/2027",start:"2027-08-01",
+  goal:"Fechar o conteúdo: álgebra, geometria analítica, eletricidade, magnetismo, física moderna e química orgânica. Começar os simulados no tempo real.",
+  routine:"Rotina semanal: conteúdo novo 60%, revisão e simulados 40%.",
+  checkpoint:"Fazer um simulado de 80 questões em 5 horas sem estourar o tempo, com o caderno de erros em dia."},
+ {n:5,name:"Reta final da 1ª fase",period:"out a início de nov/2027",start:"2027-10-01",
+  goal:"Parar de abrir conteúdo novo. Simulados, revisão dos erros e dos temas que mais caem.",
+  routine:"Um simulado por semana, correção no dia seguinte, revisão dos pontos fracos e uma redação cronometrada.",
+  checkpoint:"Chegar à prova descansado e sabendo administrar o tempo das 80 questões."},
+ {n:6,name:"2ª fase",period:"nov a dez/2027",start:"2027-11-08",
+  goal:"Treinar respostas discursivas: raciocínio completo, unidades e justificativa.",
+  routine:"Provas antigas de 2ª fase cronometradas, redação e revisão das leituras obrigatórias.",
+  checkpoint:"Resolver discursivas de exatas com a conta organizada e a resposta destacada."}
+];
+
+const PR_LABEL = {3:"Cai muito",2:"Cai às vezes",1:"Cai pouco"};
+const slug = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const SUBJECTS = DATA.children.map(s => ({key:s.key, name:s.name, color:`var(--${s.key})`}));
+const LEAVES = [], OUT = [];
+DATA.children.forEach(s => s.children.forEach(a => a.children.forEach(l => {
+  l.id = `${s.key}-${slug(a.name)}-${slug(l.name)}`;
+  l.subject = s.key; l.subjectName = s.name; l.area = a.name;
+  (l.out ? OUT : LEAVES).push(l);
+})));
+const isTopic = d => d.data.phase !== undefined;
+const CURRENT = LEAVES.find(l => l.name === "Potenciação").id;
+const phaseOf = n => PHASES.find(p => p.n === n);
+
+// ---------- Estado ----------
+const KEY = "fuvest-roadmap-v1";
+let state = new Set();
+try { const raw = localStorage.getItem(KEY); if (raw) state = new Set(JSON.parse(raw)); } catch (e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify([...state])); } catch (e) {} }
+
+function currentPhase(){
+  const now = Date.now(); let cur = 1;
+  PHASES.forEach(p => { if (now >= new Date(p.start + "T00:00:00-03:00").getTime()) cur = p.n; });
+  return cur;
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Semanas até a 1ª fase (estimada)
+(function(){
+  const t = new Date("2027-11-01T13:00:00-03:00").getTime();
+  const w = Math.max(0, Math.round((t - Date.now()) / (7 * 864e5)));
+  document.getElementById("weeks").textContent = `Faltam cerca de ${w} semanas até a 1ª fase (data estimada a partir do calendário de 2026).`;
+})();
+
+function updateOverall(){
+  const d = LEAVES.filter(l => state.has(l.id)).length;
+  document.getElementById("ov-bar").style.width = (100 * d / LEAVES.length).toFixed(1) + "%";
+  document.getElementById("ov-txt").textContent = `${d} de ${LEAVES.length} tópicos`;
+}
+
+function toggleDone(id, val){
+  if (val === undefined) val = !state.has(id);
+  if (val) state.add(id); else state.delete(id);
+  save(); updateOverall(); refreshMap(); renderRoadmap(id); if (panelNode) showPanel(panelNode);
+}
+
+// ---------- Mapa mental (D3) ----------
+const svg = d3.select("#map");
+const g = svg.append("g");
+const gLink = g.append("g");
+const gNode = g.append("g");
+const zoom = d3.zoom().scaleExtent([0.25, 2.5]).on("zoom", e => g.attr("transform", e.transform));
+svg.call(zoom).on("dblclick.zoom", null);
+
+const DX = 34, DY = 240;
+const layout = d3.tree().nodeSize([DX, DY]).separation((a, b) => a.parent === b.parent ? 1 : 1.3);
+const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+const root = d3.hierarchy(DATA, d => d.children || (d.sub ? d.sub.map(n => ({name: n, detail: true})) : null));
+root.x0 = 0; root.y0 = 0;
+root.descendants().forEach((d, i) => { d.uid = i; d._children = d.children; if (d.depth > 0) d.children = null; });
+
+const colorOf = d => { const s = d.ancestors().find(a => a.depth === 1); return s ? `var(--${s.data.key})` : "var(--ink)"; };
+function counts(d){
+  const leaves = []; (function walk(n){ if (n.data.phase !== undefined) { if (!n.data.out) leaves.push(n.data); } else (n._children || []).forEach(walk); })(d);
+  return {done: leaves.filter(l => state.has(l.id)).length, total: leaves.length, leaves};
+}
+function expandPathTo(id){
+  const target = root.descendants().length && (function find(n){ if (n.data.id === id) return n; for (const c of (n._children||[])) { const r = find(c); if (r) return r; } return null; })(root);
+  if (!target) return null;
+  target.ancestors().forEach(a => { if (a._children) a.children = a._children; });
+  return target;
+}
+
+function buildNode(el, d){
+  const n = d3.select(el);
+  if (d.data.detail){
+    n.classed("detail", true);
+    n.append("circle").attr("class","ddot").attr("r",4);
+    n.append("text").attr("class","dlbl").attr("x",10).attr("dy","0.35em").text(d.data.name);
+    return;
+  }
+  if (isTopic(d)){
+    if (d.data.id === CURRENT) n.append("circle").attr("class","pulse").attr("r",7);
+    n.append("circle").attr("class","dot").attr("r",7);
+    n.append("path").attr("class","check").attr("d","M-3.2,0.3 L-1,2.6 L3.4,-2.6");
+    const tl = n.append("text").attr("class","lbl").attr("x",14).attr("dy","0.35em");
+    tl.append("tspan").text(d.data.name);
+    if (d._children) tl.append("tspan").attr("class","more").attr("dx",6);
+    if (d.data.id === CURRENT) n.append("text").attr("class","here").attr("x",14).attr("y",19).text("você está aqui");
+  } else {
+    n.append("rect").attr("class","pill");
+    const t = n.append("text").attr("class","plbl").attr("text-anchor","middle").attr("dy","0.35em");
+    t.append("tspan").attr("class","pname").text(d.data.name);
+    t.append("tspan").attr("class","pcount").attr("dx",7);
+  }
+}
+function refreshNode(el, d){
+  const n = d3.select(el);
+  n.style("--c", colorOf(d));
+  if (d.data.detail){ n.attr("aria-label", d.data.name); return; }
+  if (isTopic(d)){
+    n.classed("done", state.has(d.data.id)).classed("hot", d.data.pr === 3).classed("out", !!d.data.out);
+    if (d._children) n.select(".more").text(d.children ? "−" : `+${d._children.length}`);
+    n.attr("aria-label", d.data.out ? `${d.data.name}, fora do programa` : `${d.data.name}, ${state.has(d.data.id) ? "estudado" : "a estudar"}${d._children ? (d.children ? ", subtópicos abertos" : ", tem subtópicos") : ""}`);
+  } else {
+    const c = counts(d);
+    n.classed("collapsed", !d.children).classed("root", d.depth === 0);
+    const outOnly = c.total === 0 && (d._children || []).some(k => k.data.out);
+    n.classed("outpill", outOnly);
+    n.select(".pcount").text(outOnly ? `${d._children.length} itens` : `${c.done}/${c.total}`);
+    const w = n.select("text").node().getComputedTextLength() + (d.depth === 0 ? 36 : 28);
+    const h = d.depth === 0 ? 36 : 28;
+    n.select(".pill").attr("x", -w/2).attr("y", -h/2).attr("width", w).attr("height", h).attr("rx", h/2);
+    n.attr("aria-label", `${d.data.name}, ${c.done} de ${c.total} estudados, ${d.children ? "aberto" : "fechado"}`);
+  }
+}
+function refreshMap(){ gNode.selectAll("g.node").each(function(d){ refreshNode(this, d); }); }
+
+function update(source){
+  const dur = reduce ? 0 : 380;
+  layout(root);
+  root.each(d => { if (d.data.detail) d.y = d.parent.y + 380; });
+  const nodes = root.descendants().reverse();
+  const links = root.links();
+
+  const node = gNode.selectAll("g.node").data(nodes, d => d.uid);
+  const enter = node.enter().append("g").attr("class","node")
+    .attr("transform", `translate(${source.y0},${source.x0})`).attr("opacity",0)
+    .attr("tabindex",0).attr("role","button")
+    .on("click", (e, d) => onNode(d))
+    .on("keydown", (e, d) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onNode(d); } });
+  enter.each(function(d){ buildNode(this, d); });
+  const all = node.merge(enter);
+  all.each(function(d){ refreshNode(this, d); });
+  all.transition().duration(dur).attr("transform", d => `translate(${d.y},${d.x})`).attr("opacity",1);
+  node.exit().transition().duration(dur).attr("transform", `translate(${source.y},${source.x})`).attr("opacity",0).remove();
+
+  const link = gLink.selectAll("path.link").data(links, d => d.target.uid);
+  const lEnter = link.enter().append("path").attr("class","link")
+    .attr("d", () => { const o = {x: source.x0, y: source.y0}; return diagonal({source:o, target:o}); });
+  link.merge(lEnter).style("--c", d => colorOf(d.target)).transition().duration(dur).attr("d", diagonal);
+  link.exit().transition().duration(dur).attr("d", () => { const o = {x: source.x, y: source.y}; return diagonal({source:o, target:o}); }).remove();
+
+  root.eachBefore(d => { d.x0 = d.x; d.y0 = d.y; });
+}
+
+function fit(animate = true){
+  const box = svg.node().getBoundingClientRect();
+  if (!box.width) return;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  root.descendants().forEach(d => { x0 = Math.min(x0, d.x); x1 = Math.max(x1, d.x); y0 = Math.min(y0, d.y); y1 = Math.max(y1, d.y); });
+  y0 -= 90; y1 += 330; x0 -= 40; x1 += 40;
+  const k = Math.max(0.45, Math.min(1.1, box.width / (y1 - y0), box.height / (x1 - x0)));
+  const tx = k*(y1 - y0) > box.width ? 16 - k*y0 : box.width/2 - k*(y0+y1)/2;
+  const ty = k*(x1 - x0) > box.height ? 16 - k*x0 : box.height/2 - k*(x0+x1)/2;
+  const t = d3.zoomIdentity.translate(tx, ty).scale(k);
+  (animate && !reduce ? svg.transition().duration(450) : svg).call(zoom.transform, t);
+}
+function focusOn(d, scale){
+  const box = svg.node().getBoundingClientRect();
+  const k = scale || Math.max(0.8, d3.zoomTransform(svg.node()).k);
+  const t = d3.zoomIdentity.translate(Math.min(box.width * 0.35, 40) - k*d.y + (box.width > 760 ? box.width*0.25 : 0), box.height/2 - k*d.x).scale(k);
+  (reduce ? svg : svg.transition().duration(450)).call(zoom.transform, t);
+}
+
+let panelNode = null;
+function onNode(d){
+  if (d.data.detail){ showPanel(d.parent); return; }
+  if (d._children){
+    d.children = d.children ? null : d._children;
+    update(d);
+  }
+  showPanel(d);
+}
+function showPanel(d){
+  panelNode = d;
+  const p = document.getElementById("panel"), b = document.getElementById("panel-body");
+  if (isTopic(d) && d.data.out){
+    b.innerHTML = `<div class="crumb">${esc(d.data.subjectName)} › ${esc(d.data.area)}</div>
+      <h3>${esc(d.data.name)}</h3>
+      <div class="chips"><span class="chip">Não está no programa da Fuvest</span></div>
+      <p>${esc(d.data.tip)}</p>
+      <p class="note">Só vale a pena depois de dominar o resto, ou se você também for prestar ITA, IME ou olimpíadas.</p>`;
+  } else if (isTopic(d)){
+    const l = d.data, ph = phaseOf(l.phase), done = state.has(l.id);
+    b.innerHTML = `<div class="crumb">${esc(l.subjectName)} › ${esc(l.area)}</div>
+      <h3>${esc(l.name)}</h3>
+      <div class="chips"><span class="chip ${l.pr===3?"hot":""}">${PR_LABEL[l.pr]}</span><span class="chip">Fase ${ph.n}: ${esc(ph.name)}</span><span class="chip">${esc(ph.period)}</span></div>
+      ${l.id===CURRENT?'<p><strong>Você está aqui.</strong> Termine este tópico antes de seguir para radiciação e notação científica.</p>':""}
+      ${l.tip?`<p>${esc(l.tip)}</p>`:""}
+      ${l.sub?`<p class="note">Subtópicos:</p><ul>${l.sub.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+      <div class="acts"><button class="btn primary" data-act="toggle">${done?"Desmarcar":"Marcar como estudado"}</button><button class="btn" data-act="goto" data-phase="${ph.n}">Ver no roadmap</button></div>`;
+  } else {
+    const c = counts(d);
+    const hot = c.leaves.filter(l => l.pr === 3 && !state.has(l.id)).slice(0, 6);
+    b.innerHTML = `<div class="crumb">${d.depth===0?"Visão geral":esc(d.ancestors().reverse().slice(1,-1).map(a=>a.data.name).join(" › ")||"Matéria")}</div>
+      <h3>${esc(d.data.name)}</h3>
+      <div class="chips"><span class="chip">${c.done} de ${c.total} estudados</span></div>
+      ${hot.length?`<p>Prioridades que ainda faltam:</p><ul>${hot.map(l=>`<li>${esc(l.name)}</li>`).join("")}</ul>`:"<p>Todas as prioridades deste ramo já foram estudadas.</p>"}
+      <p class="note">${d.children?"Ramo aberto. Clique de novo no nó para fechar.":"Ramo fechado. Clique no nó para abrir."}</p>`;
+  }
+  p.hidden = false;
+}
+document.getElementById("panel-close").addEventListener("click", () => { document.getElementById("panel").hidden = true; panelNode = null; });
+document.getElementById("panel-body").addEventListener("click", e => {
+  const btn = e.target.closest("button[data-act]"); if (!btn || !panelNode) return;
+  if (btn.dataset.act === "toggle") toggleDone(panelNode.data.id);
+  if (btn.dataset.act === "goto") goToPhase(+btn.dataset.phase);
+});
+
+function expandAll(d){ if (d._children && !isTopic(d)){ d.children = d._children; d._children.forEach(expandAll); } }
+function collapseAll(d){ if (d._children){ d._children.forEach(collapseAll); if (d.depth > 0) d.children = null; } }
+document.getElementById("b-expand").onclick = () => { expandAll(root); update(root); fit(); };
+document.getElementById("b-collapse").onclick = () => { collapseAll(root); root.children = root._children; update(root); fit(); };
+document.getElementById("b-fit").onclick = () => fit();
+document.getElementById("b-here").onclick = () => { const t = expandPathTo(CURRENT); if (t && t._children) t.children = t._children; update(root); if (t) { focusOn(t); showPanel(t); } };
+
+// estado inicial: matérias visíveis e caminho até potenciação aberto
+root.children = root._children;
+const startNode = expandPathTo(CURRENT);
+if (startNode && startNode._children) startNode.children = startNode._children;
+update(root);
+let mapFitted = false;
+
+// ---------- Roadmap ----------
+const openPhases = new Set([currentPhase()]);
+function renderRoadmap(focusId){
+  const cur = currentPhase();
+  const html = PHASES.map(p => {
+    const items = LEAVES.filter(l => l.phase === p.n);
+    const done = items.filter(l => state.has(l.id)).length;
+    const pct = items.length ? 100 * done / items.length : 0;
+    const open = openPhases.has(p.n);
+    const groups = SUBJECTS.map(s => ({s, items: items.filter(l => l.subject === s.key)})).filter(gp => gp.items.length);
+    const branchHtml = groups.map(gp => {
+      const gd = gp.items.filter(l => state.has(l.id)).length;
+      const areas = [...new Set(gp.items.map(l => l.area))];
+      return `<div class="branch" style="--c:${gp.s.color}"><h4>${esc(gp.s.name)} <span>${gd}/${gp.items.length}</span></h4>
+        ${areas.map(a => `<div class="sub"><h5>${esc(a)}</h5><ul>${gp.items.filter(l => l.area === a).map(l => `
+          <li class="${l.id===CURRENT?"here-li":""}"><label><input type="checkbox" data-id="${l.id}" ${state.has(l.id)?"checked":""}><span class="box" aria-hidden="true"></span>
+          <span class="txt"><span class="nm">${l.pr===3?`<mark>${esc(l.name)}</mark>`:esc(l.name)}</span>${l.tip?`<small>${esc(l.tip)}</small>`:""}${l.sub?`<small class="inc">Inclui: ${esc(l.sub.join(", "))}.</small>`:""}</span></label></li>`).join("")}</ul></div>`).join("")}
+      </div>`;
+    }).join("");
+    return `<section class="phase ${p.n===cur?"is-current":""} ${open?"open":""} ${done===items.length&&items.length?"complete":""}" data-phase="${p.n}">
+      <span class="ph-num" aria-hidden="true">${p.n}</span>
+      <button class="ph-head" aria-expanded="${open}" data-toggle="${p.n}">
+        <span class="ph-title"><span class="ph-name">Fase ${p.n}: ${esc(p.name)}</span><span class="ph-period">${esc(p.period)}</span></span>
+        ${p.n===cur?'<span class="tag-here">Você está aqui</span>':""}
+        <span class="ph-prog"><span class="bar"><i style="width:${pct.toFixed(1)}%"></i></span><span>${done}/${items.length}</span></span>
+        <span class="chev" aria-hidden="true"></span>
+      </button>
+      <div class="ph-body">
+        <p class="goal">${esc(p.goal)}</p>
+        <p class="routine">${esc(p.routine)}</p>
+        <div class="branches">${branchHtml}</div>
+        <div class="checkpoint"><strong>Marco para avançar:</strong> ${esc(p.checkpoint)}</div>
+      </div>
+    </section>`;
+  }).join("");
+  const outHtml = `<section class="outbox"><h3>Fora do programa atual</h3><p>Estes assuntos não estão no programa oficial da Fuvest. Não precisam entrar no seu cronograma.</p><ul>${OUT.map(o => `<li><strong>${esc(o.name)}.</strong> ${esc(o.tip)}</li>`).join("")}</ul></section>`;
+  const rm = document.getElementById("roadmap");
+  rm.innerHTML = html + outHtml;
+  if (focusId && document.activeElement === document.body) {
+    const el = rm.querySelector(`input[data-id="${focusId}"]`);
+    if (el && lastFocusedFromRoadmap) el.focus({preventScroll:true});
+  }
+  lastFocusedFromRoadmap = false;
+}
+let lastFocusedFromRoadmap = false;
+document.getElementById("roadmap").addEventListener("change", e => {
+  const t = e.target; if (!t.matches("input[data-id]")) return;
+  lastFocusedFromRoadmap = true;
+  toggleDone(t.dataset.id, t.checked);
+});
+document.getElementById("roadmap").addEventListener("click", e => {
+  const b = e.target.closest("button[data-toggle]"); if (!b) return;
+  const n = +b.dataset.toggle;
+  if (openPhases.has(n)) openPhases.delete(n); else openPhases.add(n);
+  const sec = b.closest(".phase"); sec.classList.toggle("open"); b.setAttribute("aria-expanded", openPhases.has(n));
+});
+document.getElementById("b-open-all").onclick = () => { PHASES.forEach(p => openPhases.add(p.n)); renderRoadmap(); };
+document.getElementById("b-close-all").onclick = () => { openPhases.clear(); renderRoadmap(); };
+function goToPhase(n){
+  openPhases.add(n);
+  location.hash = "roadmap";
+  renderRoadmap();
+  requestAnimationFrame(() => { const el = document.querySelector(`.phase[data-phase="${n}"]`); if (el) el.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"start"}); });
+}
+
+document.getElementById("b-reset").onclick = () => {
+  if (!confirm("Apagar todo o progresso marcado neste navegador?")) return;
+  state.clear(); save(); updateOverall(); refreshMap(); renderRoadmap();
+};
+
+// ---------- Navegação por abas ----------
+const VIEWS = ["mapa","roadmap","prova","tempo"];
+function route(){
+  const h = location.hash.slice(1);
+  const v = VIEWS.includes(h) ? h : "mapa";
+  VIEWS.forEach(x => document.getElementById("view-" + x).classList.toggle("active", x === v));
+  document.querySelectorAll(".tabs a").forEach(a => { if (a.dataset.view === v) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  if (v === "mapa" && !mapFitted) { requestAnimationFrame(() => {
+    refreshMap();
+    if (window.innerWidth < 760) { const t = root.descendants().find(d => d.data.id === CURRENT); if (t) focusOn(t, 0.85); } else fit(false);
+    mapFitted = true; }); }
+}
+window.addEventListener("hashchange", route);
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (location.hash.slice(1) === "mapa" || !VIEWS.includes(location.hash.slice(1))) fit(false); }, 200); });
+
+updateOverall();
+renderRoadmap();
+route();
+(function(){
+  const h = document.getElementById("c-h"), dd = document.getElementById("c-d");
+  if (!h || !dd) return;
+  function calc(){
+    const hv = +h.value, dv = +dd.value;
+    const weeks = Math.max(0, (new Date("2027-11-01T13:00:00-03:00").getTime() - Date.now()) / (7 * 864e5));
+    const total = Math.round(hv * dv * weeks / 10) * 10;
+    document.getElementById("c-h-out").textContent = hv.toLocaleString("pt-BR") + " h";
+    document.getElementById("c-d-out").textContent = dv;
+    document.getElementById("c-total").textContent = `cerca de ${total.toLocaleString("pt-BR")} horas`;
+    let msg;
+    if (total < 700) msg = "Dá para construir uma base forte e brigar por cursos com corte mais baixo. Para as engenharias mais disputadas, conte com a possibilidade de precisar de mais um ano.";
+    else if (total < 1200) msg = "Dá para cobrir todo o programa e ainda revisar. Engenharias com corte perto de 57 de 80 ficam ao alcance, desde que o estudo seja ativo.";
+    else msg = "Tempo suficiente para mirar cursos com corte alto, desde que você durma bem e mantenha o ritmo sem se esgotar.";
+    if (hv > 8) msg += " Acima de 8 horas por dia o rendimento costuma cair: prefira qualidade a quantidade.";
+    document.getElementById("c-msg").textContent = msg;
+  }
+  h.addEventListener("input", calc); dd.addEventListener("input", calc); calc();
+})();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { refreshMap(); });
+})();
+</script>
+</body>
+</html>
